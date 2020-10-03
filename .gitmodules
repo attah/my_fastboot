@@ -1,0 +1,12 @@
+[submodule "core"]
+	path = core
+	url = https://chromium.googlesource.com/aosp/platform/system/core
+[submodule "extras"]
+	path = extras
+	url = https://android.googlesource.com/platform/system/extras
+[submodule "avb"]
+	path = avb
+	url = https://android.googlesource.com/platform/external/avb
+[submodule "mkbootimg"]
+	path = mkbootimg
+	url = https://android.googlesource.com/platform/system/tools/mkbootimg
