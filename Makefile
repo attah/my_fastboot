@@ -1,4 +1,3 @@
-CC=g++
 CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes
 CFLAGS=-I core/fastboot \
        -I . \
@@ -41,37 +40,37 @@ all_objs = $(fastboot) \
            $(ext4_utils)
 
 $(fastboot): %.o: core/fastboot/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(base): %.o: core/base/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(diagnose_usb): %.o: core/diagnose_usb/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(liblp): %.o: core/fs_mgr/liblp/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(libsparse): %.o: core/libsparse/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(libziparchive_cc): %.o: core/libziparchive/%.cc
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(libziparchive): %.o: core/libziparchive/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(libcutils): %.o: core/libcutils/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(liblog): %.o: core/liblog/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(ext4_utils): %.o: extras/ext4_utils/%.cpp
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 fastboot: $(all_objs)
-	$(CC) $^ $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(all_objs) fastboot
