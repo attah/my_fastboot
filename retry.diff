@@ -1,0 +1,45 @@
+diff --git a/fastboot/fastboot_driver.cpp b/fastboot/fastboot_driver.cpp
+index 8d534ea32..0d411651c 100644
+--- a/core/fastboot/fastboot_driver.cpp
++++ b/core/fastboot/fastboot_driver.cpp
+@@ -384,19 +384,34 @@ RetCode FastBootDriver::RawCommand(const std::string& cmd, const std::string& me
+
+ RetCode FastBootDriver::RawCommand(const std::string& cmd, std::string* response,
+                                    std::vector<std::string>* info, int* dsize) {
++    RetCode ret;
++    int retries = 2;
++
+     error_ = "";  // Clear any pending error
++
+     if (cmd.size() > FB_COMMAND_SZ && !disable_checks_) {
+         error_ = "Command length to RawCommand() is too long";
+         return BAD_ARG;
+     }
+
+-    if (transport_->Write(cmd.c_str(), cmd.size()) != static_cast<int>(cmd.size())) {
+-        error_ = ErrnoStr("Write to device failed");
+-        return IO_ERROR;
+-    }
++    #define ever ;;
++    for (ever) {
++
++        if (transport_->Write(cmd.c_str(), cmd.size()) != static_cast<int>(cmd.size())) {
++            error_ = ErrnoStr("Write to device failed");
++            return IO_ERROR;
++        }
++
++        // Read the response
++        ret = HandleResponse(response, info, dsize);
+
+-    // Read the response
+-    return HandleResponse(response, info, dsize);
++        // Let the loop run if the response was DEVICE_FAIL an there are retries left
++        if(ret == DEVICE_FAIL && retries--)
++        {
++          continue;
++        }
++        return ret;
++    }
+ }
+
+ RetCode FastBootDriver::DownloadCommand(uint32_t size, std::string* response,
