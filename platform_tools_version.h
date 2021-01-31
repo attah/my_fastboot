@@ -1,1 +1,1 @@
-#define PLATFORM_TOOLS_VERSION "666"
+#define PLATFORM_TOOLS_VERSION "my_fastboot"

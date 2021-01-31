@@ -12,7 +12,9 @@ CFLAGS=-I core/fastboot \
        -I core/libcutils/include \
        -I core/liblog/include \
        -I core/liblog/ \
-       -I extras/ext4_utils/include/
+       -I extras/ext4_utils/include/ \
+       -DCORE_GIT_REV='"$(shell git -C core rev-parse --short HEAD)"'
+
 LDFLAGS = -lssl -lcrypto -lz
 
 all: fastboot
@@ -39,6 +41,7 @@ all_objs = $(fastboot) \
            $(liblog) \
            $(ext4_utils)
 
+# https://www.gnu.org/software/make/manual/html_node/Static-Usage.html#Static-Usage
 $(fastboot): %.o: core/fastboot/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
