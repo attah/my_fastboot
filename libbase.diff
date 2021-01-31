@@ -1,7 +1,7 @@
-diff --git a/base/logging_splitters.h b/base/logging_splitters.h
-index 2ec2b205d..ade34a78b 100644
---- a/core/base/logging_splitters.h
-+++ b/core/base/logging_splitters.h
+diff --git a/logging_splitters.h b/logging_splitters.h
+index 2ec2b20..ade34a7 100644
+--- a/libbase/logging_splitters.h
++++ b/libbase/logging_splitters.h
 @@ -79,10 +79,10 @@ static void SplitByLogdChunks(LogId log_id, LogSeverity severity, const char* ta
      int size_written = 0;
      const char* new_line = chunk_position > 0 ? "\n" : "";
@@ -14,4 +14,4 @@ index 2ec2b205d..ade34a78b 100644
 +      size_written = snprintf(logd_chunk + chunk_position, max_size + 1 - chunk_position,
                                "%s%.*s", new_line, length, message);
      }
- 
+

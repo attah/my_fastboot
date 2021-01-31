@@ -1,26 +1,31 @@
-CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes
+CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes -Wno-c99-designator
 CFLAGS=-I core/fastboot \
        -I . \
        -I mkbootimg/include/bootimg/ \
        -I avb/ \
-       -I core/base/include/ \
-       -I core/base \
+       -I libbase/include/ \
+       -I libbase \
        -I core/diagnose_usb/include/ \
        -I core/fs_mgr/liblp/include/ \
        -I core/libsparse/include/ \
-       -I core/libziparchive/include/ \
+       -I libziparchive/include/ \
        -I core/libcutils/include \
-       -I core/liblog/include \
-       -I core/liblog/ \
+       -I logging/liblog/include \
+       -I logging/liblog/ \
        -I extras/ext4_utils/include/ \
        -DCORE_GIT_REV='"$(shell git -C core rev-parse --short HEAD)"'
+
+
+ifeq ($(CXX),g++)
+  CFLAGS+=-D '__builtin_available(X,Y)=false'
+endif
 
 LDFLAGS = -lssl -lcrypto -lz
 
 all: fastboot
 
 fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o bootimg_utils.o fs.o socket.o
-base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o liblog_symbols.o errors_unix.o threads.o
+base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o errors_unix.o threads.o
 diagnose_usb = diagnose_usb.o
 libziparchive_cc = zip_archive.o zip_cd_entry_map.o
 libziparchive = zip_error.o
@@ -45,7 +50,10 @@ all_objs = $(fastboot) \
 $(fastboot): %.o: core/fastboot/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-$(base): %.o: core/base/%.cpp
+$(base): %.o: libbase/%.cpp
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+
+$(base): %.o: libbase/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(diagnose_usb): %.o: core/diagnose_usb/%.cpp
@@ -57,16 +65,16 @@ $(liblp): %.o: core/fs_mgr/liblp/%.cpp
 $(libsparse): %.o: core/libsparse/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-$(libziparchive_cc): %.o: core/libziparchive/%.cc
+$(libziparchive_cc): %.o: libziparchive/%.cc
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-$(libziparchive): %.o: core/libziparchive/%.cpp
+$(libziparchive): %.o: libziparchive/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(libcutils): %.o: core/libcutils/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-$(liblog): %.o: core/liblog/%.cpp
+$(liblog): %.o: logging/liblog/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(ext4_utils): %.o: extras/ext4_utils/%.cpp

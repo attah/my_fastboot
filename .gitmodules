@@ -10,3 +10,12 @@
 [submodule "mkbootimg"]
 	path = mkbootimg
 	url = https://android.googlesource.com/platform/system/tools/mkbootimg
+[submodule "libbase"]
+	path = libbase
+	url = https://android.googlesource.com/platform/system/libbase
+[submodule "libziparchive"]
+	path = libziparchive
+	url = https://android.googlesource.com/platform/system/libziparchive
+[submodule "logging"]
+	path = logging
+	url = https://android.googlesource.com/platform/system/logging
