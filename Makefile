@@ -13,6 +13,8 @@ CFLAGS=-I core/fastboot \
        -I logging/liblog/include \
        -I logging/liblog/ \
        -I extras/ext4_utils/include/ \
+       -I core/fs_mgr/libstorage_literals/ \
+       -I fmtlib/include/ \
        -DCORE_GIT_REV='"$(shell git -C core rev-parse --short HEAD)"'
 
 
@@ -24,7 +26,7 @@ LDFLAGS = -lssl -lcrypto -lz
 
 all: fastboot
 
-fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o bootimg_utils.o fs.o socket.o
+fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o
 base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o errors_unix.o threads.o
 diagnose_usb = diagnose_usb.o
 libziparchive_cc = zip_archive.o zip_cd_entry_map.o
@@ -34,6 +36,7 @@ liblp = images.o reader.o writer.o utility.o partition_opener.o
 libcutils = sockets.o sockets_unix.o socket_network_client_unix.o socket_inaddr_any_server_unix.o
 liblog = logger_write.o properties.o
 ext4_utils = ext4_utils.o ext4_sb.o
+fmtlib = format.o
 
 all_objs = $(fastboot) \
            $(base) \
@@ -44,7 +47,8 @@ all_objs = $(fastboot) \
            $(liblp) \
            $(libcutils) \
            $(liblog) \
-           $(ext4_utils)
+           $(ext4_utils) \
+           $(fmtlib)
 
 # https://www.gnu.org/software/make/manual/html_node/Static-Usage.html#Static-Usage
 $(fastboot): %.o: core/fastboot/%.cpp
@@ -78,6 +82,9 @@ $(liblog): %.o: logging/liblog/%.cpp
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(ext4_utils): %.o: extras/ext4_utils/%.cpp
+	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+
+$(fmtlib): %.o: fmtlib/src/%.cc
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 fastboot: $(all_objs)

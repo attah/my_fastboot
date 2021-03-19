@@ -19,3 +19,6 @@
 [submodule "logging"]
 	path = logging
 	url = https://android.googlesource.com/platform/system/logging
+[submodule "fmtlib"]
+	path = fmtlib
+	url = https://android.googlesource.com/platform/external/fmtlib
