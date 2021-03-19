@@ -1,2 +1,2 @@
 #include <atomic>
-typedef int atomic_int;
+typedef  std::atomic<int> atomic_int;
