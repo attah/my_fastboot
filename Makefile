@@ -1,4 +1,4 @@
-CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes -Wno-c99-designator
+CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes
 CFLAGS=-I core/fastboot \
        -I mocks \
        -I mkbootimg/include/bootimg/ \
@@ -20,6 +20,10 @@ CFLAGS=-I core/fastboot \
 
 ifeq ($(CXX),g++)
   CFLAGS+=-D '__builtin_available(X,Y)=false'
+endif
+
+ifeq ($(CXX),clang++)
+  CPPFLAGS+=-Wno-c99-designator
 endif
 
 LDFLAGS = -lssl -lcrypto -lz
