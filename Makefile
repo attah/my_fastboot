@@ -1,6 +1,6 @@
 CPPFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes -Wno-c99-designator
 CFLAGS=-I core/fastboot \
-       -I . \
+       -I mocks \
        -I mkbootimg/include/bootimg/ \
        -I avb/ \
        -I libbase/include/ \
