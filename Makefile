@@ -17,7 +17,7 @@ CXXFLAGS+=-I core/fastboot \
           -I logging/liblog/include \
           -I mkbootimg/include/bootimg/
 
-CXXFLAGS+=-DCORE_GIT_REV='"$(shell git -C core rev-parse --short HEAD)"'
+CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"'
 
 LDFLAGS = -lssl -lcrypto -lz
 
