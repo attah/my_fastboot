@@ -1,21 +1,22 @@
-CXXFLAGS=-std=c++17 -Wno-attributes -Wno-ignored-attributes
+CXXFLAGS=-std=c++20 -Wno-attributes -Wno-ignored-attributes
 
 CXXFLAGS+=-I core/fastboot \
           -I mocks \
           -I avb/ \
-          -I core/diagnose_usb/include/ \
-          -I core/fs_mgr/liblp/include/ \
-          -I core/fs_mgr/libstorage_literals/ \
+          -I core/diagnose_usb/include \
+          -I core/fs_mgr/liblp/include \
+          -I core/fs_mgr/libstorage_literals \
           -I core/libcutils/include \
-          -I core/libsparse/include/ \
-          -I extras/ext4_utils/include/ \
-          -I fmtlib/include/ \
+          -I core/libsparse/include \
+          -I extras/ext4_utils/include \
+          -I fmtlib/include \
           -I libbase \
-          -I libbase/include/ \
-          -I libziparchive/include/ \
-          -I logging/liblog/ \
+          -I libbase/include \
+          -I libziparchive/include \
+          -I libziparchive/incfs_support/include \
+          -I logging/liblog \
           -I logging/liblog/include \
-          -I mkbootimg/include/bootimg/
+          -I mkbootimg/include/bootimg
 
 CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"'
 
@@ -23,26 +24,18 @@ LDFLAGS = -lssl -lcrypto -lz
 
 all: fastboot
 
-# Exit status is inverse-boolean (already applied is 0)
-UNPATCHED := $(shell bash -c "git apply --reverse --check libbase.diff > /dev/null 2>&1"; echo $$?)
-
-ifeq ($(CXX),g++)
-  CXXFLAGS+=-D '__builtin_available(X,Y)=false'
-	PATCH_NEEDED=$(UNPATCHED)
+ifeq ($(findstring g++,$(CXX)), g++)
+  CXXFLAGS+=-D '__builtin_available(X,Y)=false' -D_POSIX_C_SOURCE=200112L
 endif
 
-ifeq ($(CXX),clang++)
+ifeq ($(findstring clang++,$(CXX)), clang++)
   CXXFLAGS+=-Wno-c99-designator
-endif
-
-libbase_patch: libbase/logging_splitters.h
-ifeq ($(PATCH_NEEDED),1)
-	bash -c "git apply libbase.diff"
 endif
 
 fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o \
            bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o
-base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o errors_unix.o threads.o
+base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o \
+       errors_unix.o threads.o posix_strerror_r.o
 diagnose_usb = diagnose_usb.o
 ext4_utils = ext4_utils.o ext4_sb.o
 fmtlib = format.o
@@ -100,12 +93,8 @@ $(libziparchive): %.o: libziparchive/%.cpp
 $(libziparchive_cc): %.o: libziparchive/%.cc
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-# Targets after | are run in-order only, this borks $^, but good enough...
-fastboot: | libbase_patch $(all_objs)
-	$(CXX) $(all_objs) $(LDFLAGS) -o $@
+fastboot: $(all_objs)
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(all_objs) fastboot
-ifeq ($(UNPATCHED),0)
-	bash -c "git apply --reverse libbase.diff"
-endif
