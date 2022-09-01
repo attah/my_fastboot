@@ -18,18 +18,16 @@ CXXFLAGS+=-I core/fastboot \
           -I logging/liblog/include \
           -I mkbootimg/include/bootimg
 
-CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"'
+CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"' -D_POSIX_C_SOURCE=200112L
 
 LDFLAGS = -lssl -lcrypto -lz
 
 all: fastboot
 
-ifeq ($(findstring g++,$(CXX)), g++)
-  CXXFLAGS+=-D '__builtin_available(X,Y)=false' -D_POSIX_C_SOURCE=200112L
-endif
-
 ifeq ($(findstring clang++,$(CXX)), clang++)
   CXXFLAGS+=-Wno-c99-designator
+else ifeq ($(findstring g++,$(CXX)), g++)
+  CXXFLAGS+=-D '__builtin_available(X,Y)=false'
 endif
 
 fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o \
