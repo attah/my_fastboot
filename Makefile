@@ -1,8 +1,9 @@
-CXXFLAGS=-std=c++20 -Wno-attributes -Wno-ignored-attributes
+CXXFLAGS=-std=c++20 -Wno-attributes -Wno-ignored-attributes \
+         -Wno-narrowing -Wno-deprecated-declarations \
 
 CXXFLAGS+=-I core/fastboot \
           -I mocks \
-          -I avb/ \
+          -I avb \
           -I core/diagnose_usb/include \
           -I core/fs_mgr/liblp/include \
           -I core/fs_mgr/libstorage_literals \
@@ -18,7 +19,7 @@ CXXFLAGS+=-I core/fastboot \
           -I logging/liblog/include \
           -I mkbootimg/include/bootimg
 
-CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"' -D_POSIX_C_SOURCE=200112L
+CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"' -D_POSIX_C_SOURCE=200112L -DZLIB_CONST
 
 LDFLAGS = -lssl -lcrypto -lz
 
@@ -31,21 +32,22 @@ else ifeq ($(findstring g++,$(CXX)), g++)
 endif
 
 fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o \
-           bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o
-base = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o \
-       errors_unix.o threads.o posix_strerror_r.o
+           bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o super_flash_helper.o
+libbase = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o \
+          errors_unix.o threads.o posix_strerror_r.o properties.o parsebool.o
 diagnose_usb = diagnose_usb.o
 ext4_utils = ext4_utils.o ext4_sb.o
 fmtlib = format.o
 libcutils = sockets.o sockets_unix.o socket_network_client_unix.o socket_inaddr_any_server_unix.o
-liblog = logger_write.o properties.o
-liblp = images.o reader.o writer.o utility.o partition_opener.o
+liblog = liblog_logger_write.o liblog_properties.o
+liblp = images.o reader.o writer.o utility.o partition_opener.o super_layout_builder.o builder.o \
+        property_fetcher.o
 libsparse = sparse.o sparse_read.o backed_block.o output_file.o sparse_crc32.o sparse_err.o
 libziparchive = zip_error.o
 libziparchive_cc = zip_archive.o zip_cd_entry_map.o
 
 all_objs = $(fastboot) \
-           $(base) \
+           $(libbase) \
            $(diagnose_usb) \
            $(ext4_utils) \
            $(fmtlib) \
@@ -61,7 +63,7 @@ all_objs = $(fastboot) \
 $(fastboot): %.o: core/fastboot/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(base): %.o: libbase/%.cpp
+$(libbase): %.o: libbase/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(diagnose_usb): %.o: core/diagnose_usb/%.cpp
@@ -76,7 +78,7 @@ $(fmtlib): %.o: fmtlib/src/%.cc
 $(libcutils): %.o: core/libcutils/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(liblog): %.o: logging/liblog/%.cpp
+$(liblog): liblog_%.o: logging/liblog/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(liblp): %.o: core/fs_mgr/liblp/%.cpp
