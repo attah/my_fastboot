@@ -1,5 +1,5 @@
 CXXFLAGS=-std=c++20 -Wno-attributes -Wno-ignored-attributes \
-         -Wno-narrowing -Wno-deprecated-declarations \
+         -Wno-narrowing -Wno-deprecated-declarations
 
 CXXFLAGS+=-I core/fastboot \
           -I mocks \
@@ -32,7 +32,8 @@ else ifeq ($(findstring g++,$(CXX)), g++)
 endif
 
 fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o \
-           bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o super_flash_helper.o
+           bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o super_flash_helper.o \
+           storage.o task.o filesystem.o
 libbase = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o \
           errors_unix.o threads.o posix_strerror_r.o properties.o parsebool.o
 diagnose_usb = diagnose_usb.o
@@ -61,7 +62,7 @@ all_objs = $(fastboot) \
 # https://www.gnu.org/software/make/manual/html_node/Static-Usage.html#Static-Usage
 # Can't use implicit rules and VPATH here, because there are duplicate names
 $(fastboot): %.o: core/fastboot/%.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+	$(CXX) -c $(CXXFLAGS) -include functional $< -o $@
 
 $(libbase): %.o: libbase/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
