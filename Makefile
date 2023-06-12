@@ -23,10 +23,12 @@ CXXFLAGS+=-DCORE_GIT_REV='"$(shell git describe --tags)"' -D_POSIX_C_SOURCE=2001
 
 LDFLAGS = -lssl -lcrypto -lz
 
+MISSING_INCLUDES = -include functional -include iterator
+
 all: fastboot
 
 ifeq ($(findstring clang++,$(CXX)), clang++)
-  CXXFLAGS+=-Wno-c99-designator
+  CXXFLAGS+=-Wno-c99-designator -Wno-inconsistent-missing-override
 else ifeq ($(findstring g++,$(CXX)), g++)
   CXXFLAGS+=-D '__builtin_available(X,Y)=false'
 endif
@@ -62,7 +64,7 @@ all_objs = $(fastboot) \
 # https://www.gnu.org/software/make/manual/html_node/Static-Usage.html#Static-Usage
 # Can't use implicit rules and VPATH here, because there are duplicate names
 $(fastboot): %.o: core/fastboot/%.cpp
-	$(CXX) -c $(CXXFLAGS) -include functional $< -o $@
+	$(CXX) -c $(CXXFLAGS) $(MISSING_INCLUDES) $< -o $@
 
 $(libbase): %.o: libbase/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
