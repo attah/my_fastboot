@@ -28,7 +28,7 @@ MISSING_INCLUDES = -include functional -include iterator
 all: fastboot
 
 ifeq ($(findstring clang++,$(CXX)), clang++)
-  CXXFLAGS+=-Wno-c99-designator -Wno-inconsistent-missing-override
+  CXXFLAGS+=-Wno-c99-designator -Wno-inconsistent-missing-override -Wno-vla-cxx-extension
 else ifeq ($(findstring g++,$(CXX)), g++)
   CXXFLAGS+=-D '__builtin_available(X,Y)=false'
 endif
@@ -37,7 +37,7 @@ fastboot = main.o fastboot.o fastboot_driver.o util.o tcp.o udp.o usb_linux.o \
            bootimg_utils.o vendor_boot_img_utils.o fs.o socket.o super_flash_helper.o \
            storage.o task.o filesystem.o
 libbase = file.o strings.o parsenetaddress.o stringprintf.o mapped_file.o logging.o \
-          errors_unix.o threads.o posix_strerror_r.o properties.o parsebool.o
+          errors_unix.o threads.o posix_strerror_r.o properties.o parsebool.o result.o
 diagnose_usb = diagnose_usb.o
 ext4_utils = ext4_utils.o ext4_sb.o
 fmtlib = format.o
